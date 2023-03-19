@@ -8,7 +8,8 @@ int symbol_start = 0;
 int pause_start = 0;
 int word_pause_count = 0;
 int letter_pause_count = 0;
-int dit_length = 100;
+int wpm = 15; 
+int dit_length = 1200/wpm;
 int letter_pause_length = 4*dit_length;
 int word_pause_length = 8*dit_length;
 String word_cw = "";
@@ -18,10 +19,20 @@ bool ble = false;
 const int ditPin = 26; // set the pin for dit button
 const int dahPin = 25; // set the pin for dah button
 
+
+
+
 int ditState = 0; // initialize the dit button state
 int dahState = 0; // initialize the dah button state
 bool prevDitState = false; // initialize the previous dit button state
 bool prevDahState = false; // initialize the previous dah button state
+String decoded_text = "";
+String mode_names[5] = {"Keyer","BLE_keyboard", "TRX", "Koch Trainer", "Echo Trainer"};
+int mode = 0;
+
+Button Btn_dit = Button(ditPin, true, 10);
+
+
 
 
 String morsecode[48][2] = {
@@ -41,10 +52,27 @@ String morsecode[48][2] = {
 
 
 
+
+
+
+
+String padString(String str, int maxChars) {
+  int strLength = str.length();
+  if (strLength >= maxChars) {
+    return str.substring(strLength - maxChars);
+  } else {
+    String spaces = "";
+    for (int i = 0; i < maxChars - strLength; i++) {
+      spaces += " ";
+    }
+    return spaces + str;
+  }
+}
+
 void openMenu() {
   int menuSelection = 0; // initialize the menu selection to the first option
   int numMenuItems = 6; // the number of items in the menu
-  String menuItems[6] = {"Dit Length","Beep","BLE Keyb","BtnA key","Touch paddle", "Exit Menu"}; // the items in the menu
+  String menuItems[6] = {"Keyer WPM","Beep","BLE Keyb","BtnA key","Touch paddle", "Exit Menu"}; // the items in the menu
   int menuX = 0; // the x position of the menu
   int menuY = 0; // the y position of the menu
   int menuItemHeight = 20; // the height of each menu item
@@ -76,23 +104,24 @@ void openMenu() {
     
     if (M5.BtnA.wasPressed()) {
       if (menuSelection == 0) {
-        // Change Dit Length
+        // Change Keyer WPM
         M5.Lcd.fillRect(0, 0, 200, 120, BLACK);
         M5.Lcd.setCursor(0, 0);
         M5.Lcd.setTextColor(WHITE);
-        M5.Lcd.print("Dit Length:");
+        M5.Lcd.print("WPM:");
         M5.Lcd.setCursor(80,0);
-        M5.Lcd.print(dit_length);
+        M5.Lcd.print(wpm);
         while (true) {
           M5.update();
           if (M5.BtnA.wasPressed()) {
             M5.Lcd.fillRect(80, 0, 200, 120, BLACK);
-            dit_length += 20;
-            if (dit_length > 200) {
-                dit_length = 20;
+            wpm += 1;
+            if (wpm > 30) {
+                dit_length = 10;
                 }
+            dit_length = 1200/wpm;
             M5.Lcd.setCursor(80,0);
-            M5.Lcd.print(dit_length);
+            M5.Lcd.print(wpm);
           }
           if (M5.BtnB.wasPressed()) {
             M5.Lcd.fillScreen(BLACK);
@@ -148,11 +177,11 @@ void openMenu() {
       }else if (menuSelection == 3) {
         // BtnA Key
         M5.Lcd.fillScreen(BLACK);
-        butonA_key();
+        //buton_key();
     }else if (menuSelection == 4) {
         // Touch paddle
         M5.Lcd.fillScreen(BLACK);
-        touch_paddle();
+        //touch_paddle();
     }else if (menuSelection == 5) {
         // Exit Menu
         M5.Lcd.fillScreen(BLACK);
@@ -165,108 +194,132 @@ void openMenu() {
 
 
 
-void touch_paddle(){
-  while (!M5.BtnB.wasPressed()) {
-      M5.Lcd.setTextFont(4);
-      M5.Lcd.setCursor(0, 0);
-      M5.Lcd.print(word_cw);
-      M5.update();
-      
-      // read the current state of the dit button
-      ditState = digitalRead(ditPin);
 
-      // if the dit button state has changed
-      if ((millis()-pause_start >= 2*dit_length && prevDitState) or (millis()-pause_start >= 4*dit_length)) {
+
+
+String touch_paddle(){
+  while(true){
+    M5.Lcd.setTextFont(4);
+    M5.Lcd.setCursor(0, 0);
+    M5.Lcd.print(word_cw);
+    M5.update();
+
+    // read the current state of the dit button
+    ditState = digitalRead(ditPin);
+
+        // if the dit button state has changed
+        if ((millis()-pause_start >= 2*dit_length && prevDitState) or (millis()-pause_start >= 4*dit_length)) {
         // if the button is pressed
         if (ditState == HIGH) {
-          pause_start = millis();
-          word_cw += ".";
-          letter_pause_count = 0;
-          word_pause_count = 0;
-          if (beep == true){
+            pause_start = millis();
+            word_cw += ".";
+            letter_pause_count = 0;
+            word_pause_count = 0;
+            if (beep == true){
             M5.Beep.tone(400,dit_length);
-          }          
+            }          
         prevDitState = true; // update the previous dit button state
         prevDahState = false; // update the previous dah button state
         }
 
-      }
-    // read the current state of the dah button
-    dahState = digitalRead(dahPin);
-
-    // if the dah button state has changed
-    if ((millis()-pause_start >= 4*dit_length) or (millis()-pause_start >= 2*dit_length && prevDitState ) )   {
-      // if the button is pressed
-      if (dahState == HIGH) {
-        pause_start = millis();
-        word_cw += "-";
-        letter_pause_count = 0;
-        word_pause_count = 0;
-        if (beep == true){
-          M5.Beep.tone(400,3*dit_length);
         }
-        prevDitState = false; // update the previous dit button state
-        prevDahState = true; // update the previous dah button state
+        // read the current state of the dah button
+        dahState = digitalRead(dahPin);
+
+        // if the dah button state has changed
+        if ((millis()-pause_start >= 4*dit_length) or (millis()-pause_start >= 2*dit_length && prevDitState ) )   {
+        // if the button is pressed
+        if (dahState == HIGH) {
+            pause_start = millis();
+            word_cw += "-";
+            letter_pause_count = 0;
+            word_pause_count = 0;
+            if (beep == true){
+            M5.Beep.tone(400,3*dit_length);
+            }
+            prevDitState = false; // update the previous dit button state
+            prevDahState = true; // update the previous dah button state
+        }
+    
+    
     }
- 
-  
-  }
-      if ((millis()) - pause_start >= letter_pause_length && letter_pause_count == 0) {
-        //pause_start = 0;
-        String morse_char = "";
+        if ((millis()) - pause_start >= letter_pause_length && letter_pause_count == 0) {
+            //pause_start = 0;
+            String morse_char = "";
+            M5.Lcd.setCursor(0, 0);
+            M5.Lcd.print(word_cw);
+            M5.Lcd.fillRect(0, 40, 240, 80, BLACK); // erase previous character
+            
+            for (int i = 0; i < 48; i++) {
+            if (word_cw == morsecode[i][0]) {
+                morse_char = morsecode[i][1];
+                break;
+            }
+            }
+            if (morse_char == "") {
+            M5.Lcd.setCursor(0, 40);
+            M5.Lcd.print("???");
+            
+            }  
+            else if (morse_char == "backspace") {
+            M5.Lcd.setCursor(0, 40);
+            M5.Lcd.print(morse_char);
+            decoded_text.remove(decoded_text.length()-1,1);
+            decoded_text = padString(decoded_text, 16);
+            M5.Lcd.setCursor(0, 80);
+            M5.Lcd.print(decoded_text);
+            
+            
+            if (ble == true){
+            bleKeyboard.write(KEY_BACKSPACE);
+            } 
+            return morse_char;
+            }
+            else {
+            M5.Lcd.setCursor(0, 40);
+            M5.Lcd.print(morse_char);
+            decoded_text = decoded_text+=morse_char;
+            decoded_text = padString(decoded_text, 16);
+            M5.Lcd.setCursor(0, 80);
+            M5.Lcd.print(decoded_text);
+
+            if (ble == true){
+            bleKeyboard.write(morse_char.charAt(0));
+                    }
+            
+        }
+        M5.Lcd.fillRect(0, 0, 100, 30, BLACK); // erase previous character
+        word_cw = "";
+        letter_pause_count += 1;
+        return morse_char;     
+        }
+        
+        if ((millis()) - pause_start >= word_pause_length && word_pause_count == 0) {
+        String morse_char = " ";
         M5.Lcd.setCursor(0, 0);
         M5.Lcd.print(word_cw);
-        M5.Lcd.fillRect(0, 60, 100, 30, BLACK); // erase previous character
+        M5.Lcd.fillRect(0, 40, 240, 120, BLACK); // erase previous character
         
-        for (int i = 0; i < 48; i++) {
-          if (word_cw == morsecode[i][0]) {
-            morse_char = morsecode[i][1];
-            break;
-          }
+        decoded_text = decoded_text+=morse_char;
+        decoded_text = padString(decoded_text, 16);
+        M5.Lcd.setCursor(0, 80);
+        M5.Lcd.print(decoded_text);
+        if (ble == true){
+        bleKeyboard.write(morse_char.charAt(0));
         }
-        if (morse_char == "") {
-          M5.Lcd.setCursor(0, 60);
-          M5.Lcd.print("???");
-          
-        }  
-        else if (morse_char == "backspace") {
-          M5.Lcd.setCursor(0, 60);
-          M5.Lcd.print(morse_char);
-          if (ble == true){
-          bleKeyboard.write(KEY_BACKSPACE);
-          } 
+        word_pause_count += 1;
+        letter_pause_count += 1;
         }
-        else {
-          M5.Lcd.setCursor(0, 60);
-          M5.Lcd.print(morse_char);
-          if (ble == true){
-          bleKeyboard.write(morse_char.charAt(0));
-                }
-       }
-       M5.Lcd.fillRect(0, 0, 100, 30, BLACK); // erase previous character
-       word_cw = "";
-       letter_pause_count += 1;     
-    }
-      
-    if ((millis()) - pause_start >= word_pause_length && word_pause_count == 0) {
-      String morse_char = " ";     
-      if (ble == true){
-      bleKeyboard.write(morse_char.charAt(0));
-      }
-      word_pause_count += 1;
-      letter_pause_count += 1;
-    }
-
   }
 }
 
 
-void butonA_key(){
-  while (!M5.BtnB.wasPressed()) {
-      M5.Lcd.setTextFont(4);
-      M5.Lcd.setCursor(0, 0);
-      M5.Lcd.print(word_cw);
-      M5.update();
+void buton_key(){
+
+  M5.Lcd.setTextFont(4);
+  M5.Lcd.setCursor(0, 0);
+  M5.Lcd.print(word_cw);
+  M5.update();
       
       if (M5.BtnA.wasPressed()) {
         symbol_start = millis();
@@ -303,7 +356,7 @@ void butonA_key(){
         
         M5.Lcd.setCursor(0, 0);
         M5.Lcd.print(word_cw);
-        M5.Lcd.fillRect(0, 60, 100, 30, BLACK); // erase previous character
+        M5.Lcd.fillRect(0, 40, 100, 30, BLACK); // erase previous character
         
         for (int i = 0; i < 48; i++) {
           if (word_cw == morsecode[i][0]) {
@@ -312,11 +365,11 @@ void butonA_key(){
           }
         }
         if (morse_char == "") {
-          M5.Lcd.setCursor(0, 60);
+          M5.Lcd.setCursor(0, 40);
           M5.Lcd.print("???");
         } 
         else if (morse_char == "backspace") {
-          M5.Lcd.setCursor(0, 60);
+          M5.Lcd.setCursor(0, 40);
           M5.Lcd.print(morse_char);
           if (ble == true){
           bleKeyboard.write(KEY_BACKSPACE);
@@ -324,8 +377,11 @@ void butonA_key(){
         }
         else{  
           
-          M5.Lcd.setCursor(0, 60);
+          M5.Lcd.setCursor(0, 40);
           M5.Lcd.print(morse_char);
+          decoded_text = padString(decoded_text+morse_char, 16);
+          M5.Lcd.setCursor(0, 80);
+          M5.Lcd.print(decoded_text);
           if (ble == true){
           bleKeyboard.write(morse_char.charAt(0));
                 }
@@ -337,7 +393,10 @@ void butonA_key(){
     }
   
     if ((millis()) - pause_start >= word_pause_length && word_pause_count == 0) {
-      String morse_char = " ";     
+      String morse_char = " ";
+      decoded_text = padString(decoded_text+morse_char, 16);
+      M5.Lcd.setCursor(0, 80);
+      M5.Lcd.print(decoded_text);
       if (ble == true){
       bleKeyboard.write(morse_char.charAt(0));
       }
@@ -346,9 +405,6 @@ void butonA_key(){
   
 }
 
-
-
-}
 
 
 
@@ -360,19 +416,46 @@ void setup() {
   M5.Lcd.fillScreen(BLACK);
   M5.Lcd.setTextColor(WHITE);
   M5.Lcd.setTextFont(6);
-  M5.Lcd.setRotation(3);  
+  M5.Lcd.setRotation(3);
+  M5.Lcd.setTextFont(2);
+  M5.Lcd.setCursor(110,0);
+  M5.Lcd.print(wpm);
+  M5.Lcd.print(" WPM");
+  M5.Lcd.setCursor(110,20);
+  M5.Lcd.print(mode_names[mode]);
   
-
 }
 
 void loop(){
+  String morse_char;
+
+    if (M5.BtnB.wasPressed()) {
+        openMenu();
+    }
+
+
+
+
   //butonA_key();
-  touch_paddle();
+
+  switch (mode) {
+  case 0: // touch keyer
+    morse_char = touch_paddle();
+    break;
+  case 1:
+    // Tue etwas, wenn "var" 2 ist
+    break;
+  default:
+    // Tue etwas, im Defaultfall
+    // Dieser Fall ist optional
+    break; // Wird nicht benötigt, wenn Statement(s) vorhanden sind
+}
+
+
+
         
     
-    if (M5.BtnB.wasPressed()) {
-    openMenu();
-  }
+
   
   
    
