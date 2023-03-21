@@ -12,7 +12,7 @@ This project is a versatile Morse code trainer, communicator, and CW keyer desig
 ![Add-on Module open](img/hat_open.jpg)
 
 
-![Addon Module open](img/menu.jpg)
+![Addon Module open](img/menue.jpg)
 
 ## Features
 
