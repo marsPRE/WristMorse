@@ -4,9 +4,13 @@
 
 This project is a versatile Morse code trainer, communicator, and CW keyer designed for the M5StickC Plus device. It is inspired by the Morserino project, but with the goal of creating a much smaller, wrist-mounted device and is programmed from scratch as a programming exercise. The project features multiple modes for practicing, sending Morse code messages, and operating as a touch paddle and CW keyer. With a user-friendly interface and a custom-built add-on module with touch paddles and a 2.5mm plug for radio connection, this project is suitable for both beginners and experienced Morse code enthusiasts.
 
-![M5StickC Plus with Add-on Module](add_on_module.jpg)
+![M5StickC Plus with Add-on Module](img/touch_keyer.jpg)
+
+
 
 *Image of the M5StickC Plus device with custom-built add-on module*
+![Add-on Module open](img/hat_open.jpg)
+
 
 ## Features
 
@@ -44,7 +48,7 @@ To use this project, follow these steps:
 - Enhance touch paddle responsiveness and customization
 - Add support for external displays and accessories
 - Improve documentation and provide detailed user guides
-
+- Simplify build by using M5 proto board
 ## Contributing
 
 We welcome contributions to this project. If you have suggestions, bug reports, or want to contribute code, feel free to open an issue or create a pull request.
