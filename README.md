@@ -1,4 +1,4 @@
-# Morse Code Trainer, Communicator, and CW Keyer for M5StickC Plus
+# Morse Code Trainer, Communicator, and CW Keyer for esp32 based M5StickC Plus
 
 ## Introduction
 
