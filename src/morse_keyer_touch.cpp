@@ -386,6 +386,39 @@ void openMenu() {
         M5.Lcd.fillScreen(BLACK);; // clear the screen
         print_status();
         break; // exit the menu loop
+      } else if (menuItems[menuSelection] == "Keyer Mode") { // if the "Keyer Mode" is selected, Wifi and Bluetooth are switched off to save battery
+        WiFi.mode(WIFI_OFF);
+        btStop();
+        mode = menuSelection; // set the mode based on the selected menu item
+        M5.Lcd.fillScreen(BLACK);; // clear the screen
+        print_status();
+        break; // exit the menu loop
+      } else if (menuItems[menuSelection] == "TRX Mode") { 
+        mode = menuSelection; // set the mode based on the selected menu item
+        M5.Lcd.fillScreen(BLACK);; // clear the screen
+        print_status();
+        break; // exit the menu loop
+      } else if (menuItems[menuSelection] == "Koch Trainer Mode") { // if the "Koch Trainer Mode" is selected, Wifi and Bluetooth are switched off to save battery
+        WiFi.mode(WIFI_OFF);
+        btStop();
+        mode = menuSelection; // set the mode based on the selected menu item
+        M5.Lcd.fillScreen(BLACK);; // clear the screen
+        print_status();
+        break; // exit the menu loop
+      } else if (menuItems[menuSelection] == "Koch New Lesson Mode") { // if the "Koch New Lesson Mode" is selected, Wifi and Bluetooth are switched off to save battery
+        WiFi.mode(WIFI_OFF);
+        btStop();
+        mode = menuSelection; // set the mode based on the selected menu item
+        M5.Lcd.fillScreen(BLACK);; // clear the screen
+        print_status();
+        break; // exit the menu loop
+      } else if (menuItems[menuSelection] == "Echo Trainer Mode") { // if the "Echo Trainer Mode" is selected, Wifi and Bluetooth are switched off to save battery
+        WiFi.mode(WIFI_OFF);
+        btStop();
+        mode = menuSelection; // set the mode based on the selected menu item
+        M5.Lcd.fillScreen(BLACK);; // clear the screen
+        print_status();
+        break; // exit the menu loop
       }
       
       
@@ -410,9 +443,6 @@ void print_decoded_text(String decoded_text){
 
 String touch_paddle(){
   M5.Lcd.setTextFont(4);
-  //pause_start = millis();
-  //letter_pause_count = 1;
-
 
   while(true){
     
@@ -599,6 +629,17 @@ void buton_key(){
 
 
 
+
+void screen_power(int on_time){
+// function to power off screen, when time since press
+// of button or key is longer than on_time. Also recption of 
+// message will power on screen 
+
+  if (millis() - pause_start >= on_time){
+    M5.Lcd.setBrightness(0);
+    screen_on = false;
+
+} 
 
 
 
