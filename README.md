@@ -41,6 +41,59 @@ To use this project, follow these steps:
 7. Upload the code to your M5StickC Plus device.
 8. Navigate through the menu using the buttons on the device and select the desired mode.
 
+
+
+## Bill of Material
+
+| Item | Quantity |Source|
+|------|----------|------|
+| M5StickC Plus | 1 |https://amzn.eu/d/3ySDARb
+| CONN HEADER VERT 10POS 2.54MM| 1 |https://amzn.eu/d/7BOjlZF|
+| Enameled Copper Wire 0.4mm | 0.5m | https://amzn.eu/d/dhf6aA8 | 
+| TTP223 Capacitive Touch Sensor Module | 2 |https://amzn.eu/d/hMWKoeN|
+| DTC143E Digital Transistor| 2 |https://www.rs-online-privat.de/Products/ProductDetail/ROHM-DTC143EKAT146-SMD-NPN-Digitaler-Transistor-100-mA-SMD-3-Pin-2461671
+| 3.5mm 5pin DIP PCB (e.g. from HALJIA) | 1 | https://amzn.eu/d/eXsqrqV |
+| 3D printed Base part | 1 | [base](/cad/WristMorse_base.stl)|
+| 3D printed Lid | 1 | [lid](/cad/WristMorse_lid.stl)|
+| Superglue | some | you know were to get it |
+
+
+
+## Wiring
+
+![Wiring](img/schematic.png)
+
+
+
+## Assembly
+
+1. 3d Printing of base and lid part. I used TinkerCad, feel free to modify: [link to tinkercad repository](https://www.tinkercad.com/things/aN4yCXyS5EN?sharecode=FDEHknXaCy3AVA37gZpHX5ytrah3ygyH9-0glm6WoO8)
+![CAD](img/CAD.png)
+
+2. Glue DTC143E Digital Transistor to TTP223 capacitive touch board. Pins shoud be close to the I/O and GND holes. They will be connected using solder, once wires are solderd. Double check for connections, should be bottom up.
+![DTC143E glued onto TTP223](/img/TTP223_DTC143E_glued.jpg)
+
+3. Attach 3.5mm phone jack to 3d printed base.
+
+4. Cut Pin header to 8 pins.
+
+5. Prepare Copper Wire with lengths as indicatd in image, remove isolation at wire ends using sand paper and solder. Solder to pin header, as shown in diagram.
+![Pin Preparation](/img/pin_wiring.jpg)
+
+6. Solder wires to Touch Sensor boards, then use solder to cennect neighboring Transistor pins
+![TTP223 Soldering](/img/TTP223_soldering.jpg)
+
+7. Glue pin header to 3D printed base
+
+8. Solder remaining pin of transistors to 3.5mm phone jack pins
+
+9. Solder Ground wire to phone jack
+![base finished](/img/base_finished.jpg)
+
+10. Place lid. Lid does not fit well, currenlty.. Need to work on it
+
+
+
 ## To Do
 
 - Improve the user interface for better user experience
