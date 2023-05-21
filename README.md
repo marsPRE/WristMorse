@@ -89,6 +89,7 @@ To use this project, follow these steps:
 
 9. Solder Ground wire to phone jack
 ![base finished](/img/base_finished.jpg)
+![base finished](/img/M5_base.jpg)
 
 10. Place lid. Lid does not fit well, currenlty.. Need to work on it
 
