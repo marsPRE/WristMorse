@@ -20,6 +20,7 @@ int letter_pause_count = 0;
 String word_cw = "";
 bool beep = true;
 bool ble = false;
+bool screen_on = true;
 
 // Pin definitions
 const int ditPin = 26; // set the pin for dit button
@@ -640,7 +641,7 @@ void screen_power(int on_time){
     screen_on = false;
 
 } 
-
+}
 
 
 
